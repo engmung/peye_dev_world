@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>피아이개발팀 — 레포 탐색기</title>
+  <title>피아이개발팀 — 깃허브 놀이터</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -67,13 +67,40 @@
       margin-bottom: 48px;
     }
 
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
     header h1 {
       font-family: 'JetBrains Mono', monospace;
       font-size: 2rem;
       font-weight: 700;
       color: var(--accent);
       letter-spacing: -0.5px;
-      margin-bottom: 8px;
+    }
+
+    .gh-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .gh-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
     }
 
     header p {
@@ -82,54 +109,27 @@
       line-height: 1.6;
     }
 
-    .config-bar {
+    .members {
       display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 32px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-top: 16px;
     }
 
-    .config-bar input {
-      flex: 1;
-      min-width: 200px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 16px;
-      border-radius: 8px;
+    .member-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.2s;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid;
     }
 
-    .config-bar input:focus {
-      border-color: var(--accent);
-    }
-
-    .config-bar input::placeholder {
-      color: var(--text-dim);
-    }
-
-    .config-bar button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      white-space: nowrap;
-    }
-
-    .config-bar button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px var(--accent-glow);
-    }
+    .member-badge.승훈 { color: var(--accent); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.05); }
+    .member-badge.채빈 { color: var(--purple); border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.05); }
+    .member-badge.예인 { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.05); }
 
     .stats {
       display: grid;
@@ -163,6 +163,37 @@
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--text);
+    }
+
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .refresh-bar span {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      flex: 1;
+    }
+
+    .refresh-btn {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .refresh-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
     .tree-container {
@@ -242,6 +273,7 @@
     .indent-2 { padding-left: 48px; }
     .indent-3 { padding-left: 72px; }
 
+    /* 멤버 폴더 색상 */
     .member-colors .승훈 { border-left: 3px solid var(--accent); padding-left: 9px; }
     .member-colors .채빈 { border-left: 3px solid var(--purple); padding-left: 9px; }
     .member-colors .예인 { border-left: 3px solid var(--green); padding-left: 9px; }
@@ -264,6 +296,11 @@
       animation: spin 0.8s linear infinite;
     }
 
+    .loading span {
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .error-msg {
@@ -272,14 +309,6 @@
       color: var(--text-dim);
       font-size: 0.9rem;
       line-height: 1.8;
-    }
-
-    .error-msg code {
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--surface-hover);
-      padding: 2px 8px;
-      border-radius: 4px;
-      color: var(--accent);
     }
 
     .recent-commits {
@@ -347,6 +376,14 @@
       opacity: 0.7;
     }
 
+    .last-updated {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 16px;
+    }
+
     @media (max-width: 600px) {
       .container { padding: 32px 16px; }
       header h1 { font-size: 1.4rem; }
@@ -360,14 +397,19 @@
 
   <div class="container">
     <header>
-      <h1>피아이개발팀</h1>
+      <div class="header-top">
+        <h1>피아이개발팀</h1>
+        <a class="gh-link" href="https://github.com/engmung/peye_dev_world" target="_blank" rel="noopener">
+          ⭐ engmung/peye_dev_world
+        </a>
+      </div>
       <p>깃허브에서 같이 놀면서 배우는 중. 이 페이지는 레포의 실시간 구조를 보여줘.</p>
+      <div class="members">
+        <span class="member-badge 승훈">🔥 승훈</span>
+        <span class="member-badge 채빈">💜 채빈</span>
+        <span class="member-badge 예인">💚 예인</span>
+      </div>
     </header>
-
-    <div class="config-bar">
-      <input type="text" id="repoInput" placeholder="owner/repo (예: seunghun/pi-dev-team)" />
-      <button onclick="loadRepo()">불러오기</button>
-    </div>
 
     <div class="stats" id="stats" style="display:none;">
       <div class="stat-card">
@@ -388,10 +430,15 @@
       </div>
     </div>
 
+    <div class="refresh-bar">
+      <span id="lastUpdated"></span>
+      <button class="refresh-btn" onclick="loadRepo()">↻ 새로고침</button>
+    </div>
+
     <div class="tree-container" id="treeContainer">
-      <div class="error-msg">
-        위에 레포 주소를 입력하고 <code>불러오기</code>를 눌러봐.<br>
-        예: <code>seunghun/pi-dev-team</code>
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>불러오는 중...</span>
       </div>
     </div>
 
@@ -403,21 +450,14 @@
 
   <script>
     const API = 'https://api.github.com';
-    let currentRepo = '';
+    const REPO = 'engmung/peye_dev_world';
 
     async function loadRepo() {
-      const input = document.getElementById('repoInput').value.trim();
-      if (!input || !input.includes('/')) {
-        alert('owner/repo 형식으로 입력해줘! 예: seunghun/pi-dev-team');
-        return;
-      }
-      currentRepo = input;
-
-      // Save to URL for sharing
-      window.location.hash = input;
-
+      document.getElementById('lastUpdated').textContent = '';
       const treeContainer = document.getElementById('treeContainer');
       treeContainer.innerHTML = '<div class="loading"><div class="spinner"></div><span>불러오는 중...</span></div>';
+      document.getElementById('stats').style.display = 'none';
+      document.getElementById('commitsSection').style.display = 'none';
 
       try {
         const [tree, commits, contributors] = await Promise.all([
@@ -429,35 +469,34 @@
         renderStats(tree, commits, contributors);
         renderTree(tree);
         renderCommits(commits);
+
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent =
+          `마지막 업데이트: ${now.toLocaleTimeString('ko-KR')}`;
       } catch (err) {
         treeContainer.innerHTML = `
           <div class="error-msg">
             레포를 불러올 수 없어.<br>
-            주소가 맞는지, 레포가 public인지 확인해봐.<br><br>
-            <code>${currentRepo}</code>
+            잠시 후 다시 시도해봐.<br><br>
+            <code>${REPO}</code>
           </div>`;
       }
     }
 
     async function fetchTree() {
-      const res = await fetch(`${API}/repos/${currentRepo}/git/trees/main?recursive=1`);
-      if (!res.ok) {
-        // try 'master' branch
-        const res2 = await fetch(`${API}/repos/${currentRepo}/git/trees/master?recursive=1`);
-        if (!res2.ok) throw new Error('Cannot fetch tree');
-        return res2.json();
-      }
+      const res = await fetch(`${API}/repos/${REPO}/git/trees/main?recursive=1`);
+      if (!res.ok) throw new Error('Cannot fetch tree');
       return res.json();
     }
 
     async function fetchCommits() {
-      const res = await fetch(`${API}/repos/${currentRepo}/commits?per_page=10`);
+      const res = await fetch(`${API}/repos/${REPO}/commits?per_page=10`);
       if (!res.ok) return [];
       return res.json();
     }
 
     async function fetchContributors() {
-      const res = await fetch(`${API}/repos/${currentRepo}/contributors?per_page=10`);
+      const res = await fetch(`${API}/repos/${REPO}/contributors?per_page=10`);
       if (!res.ok) return [];
       return res.json();
     }
@@ -474,7 +513,7 @@
     }
 
     function buildTreeStructure(flatTree) {
-      const root = { name: currentRepo.split('/')[1], children: {}, type: 'tree' };
+      const root = { name: REPO.split('/')[1], children: {}, type: 'tree' };
 
       flatTree.forEach(item => {
         const parts = item.path.split('/');
@@ -536,7 +575,7 @@
       const tree = buildTreeStructure(data.tree);
       let html = `
         <div class="tree-header">
-          <h2>📂 ${currentRepo}</h2>
+          <h2>📂 ${REPO}</h2>
           <span class="branch-tag">main</span>
         </div>
         <div class="member-colors">
@@ -544,20 +583,22 @@
 
       function renderNode(node, depth = 0) {
         const entries = Object.values(node.children);
-        // folders first, then files, alphabetical
-        entries.sort((a, b) => {
+        // .gitkeep 숨기기
+        const visible = entries.filter(e => e.name !== '.gitkeep');
+        // 폴더 먼저, 그다음 파일, 알파벳 순
+        visible.sort((a, b) => {
           if (a.type === 'tree' && b.type !== 'tree') return -1;
           if (a.type !== 'tree' && b.type === 'tree') return 1;
           return a.name.localeCompare(b.name);
         });
 
-        entries.forEach(entry => {
+        visible.forEach(entry => {
           const indentClass = depth > 0 ? ` indent${depth > 1 ? `-${Math.min(depth, 3)}` : ''}` : '';
           const memberClass = getMemberColor(entry.path);
           const isFolder = entry.type === 'tree';
           const icon = isFolder ? '📁' : getFileIcon(entry.name);
           const meta = isFolder ? '' : formatSize(entry.size);
-          const ghUrl = `https://github.com/${currentRepo}/${isFolder ? 'tree' : 'blob'}/main/${entry.path}`;
+          const ghUrl = `https://github.com/${REPO}/${isFolder ? 'tree' : 'blob'}/main/${entry.path}`;
 
           html += `
             <a class="tree-item ${isFolder ? 'folder' : 'file'}${indentClass} ${memberClass}"
@@ -625,14 +666,8 @@
       return div.innerHTML;
     }
 
-    // Load from URL hash on page load
-    window.addEventListener('load', () => {
-      const hash = window.location.hash.slice(1);
-      if (hash) {
-        document.getElementById('repoInput').value = hash;
-        loadRepo();
-      }
-    });
+    // 페이지 로드 시 자동으로 레포 불러오기
+    window.addEventListener('load', loadRepo);
   </script>
 </body>
 </html>
