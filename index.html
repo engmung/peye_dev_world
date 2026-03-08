@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>피아이개발팀 — 레포 탐색기</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-hover: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e4e4ef;
+      --text-dim: #7a7a8f;
+      --accent: #ff6b35;
+      --accent-glow: rgba(255, 107, 53, 0.15);
+      --green: #4ade80;
+      --blue: #60a5fa;
+      --purple: #c084fc;
+      --yellow: #fbbf24;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb {
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -200px; right: -200px;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-30px, 20px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .config-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .config-bar input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .config-bar input:focus {
+      border-color: var(--accent);
+    }
+
+    .config-bar input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .config-bar button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+
+    .config-bar button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent);
+    }
+
+    .stat-card .label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tree-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 200px;
+    }
+
+    .tree-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tree-header h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    .tree-header .branch-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: rgba(74, 222, 128, 0.1);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .tree-item:hover {
+      background: var(--surface-hover);
+    }
+
+    .tree-item .icon {
+      width: 20px;
+      margin-right: 10px;
+      font-size: 0.9rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .tree-item .name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      flex: 1;
+    }
+
+    .tree-item .meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tree-item.folder .name { color: var(--blue); }
+    .tree-item.folder .icon { color: var(--yellow); }
+    .tree-item.file .icon { color: var(--text-dim); }
+
+    .indent { padding-left: 24px; }
+    .indent-2 { padding-left: 48px; }
+    .indent-3 { padding-left: 72px; }
+
+    .member-colors .승훈 { border-left: 3px solid var(--accent); padding-left: 9px; }
+    .member-colors .채빈 { border-left: 3px solid var(--purple); padding-left: 9px; }
+    .member-colors .예인 { border-left: 3px solid var(--green); padding-left: 9px; }
+
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      color: var(--text-dim);
+      gap: 16px;
+    }
+
+    .loading .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .error-msg code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--surface-hover);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    .recent-commits {
+      margin-top: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .recent-commits h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .commit-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(42, 42, 58, 0.5);
+      gap: 12px;
+    }
+
+    .commit-item:last-child { border-bottom: none; }
+
+    .commit-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--border);
+    }
+
+    .commit-info { flex: 1; min-width: 0; }
+
+    .commit-msg {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .commit-meta {
+      font-size: 0.73rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .commit-meta strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .commit-hash {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.73rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 32px 16px; }
+      header h1 { font-size: 1.4rem; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="glow-orb"></div>
+
+  <div class="container">
+    <header>
+      <h1>피아이개발팀</h1>
+      <p>깃허브에서 같이 놀면서 배우는 중. 이 페이지는 레포의 실시간 구조를 보여줘.</p>
+    </header>
+
+    <div class="config-bar">
+      <input type="text" id="repoInput" placeholder="owner/repo (예: seunghun/pi-dev-team)" />
+      <button onclick="loadRepo()">불러오기</button>
+    </div>
+
+    <div class="stats" id="stats" style="display:none;">
+      <div class="stat-card">
+        <div class="label">파일</div>
+        <div class="value" id="fileCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">폴더</div>
+        <div class="value" id="folderCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">커밋</div>
+        <div class="value" id="commitCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">기여자</div>
+        <div class="value" id="contributorCount">0</div>
+      </div>
+    </div>
+
+    <div class="tree-container" id="treeContainer">
+      <div class="error-msg">
+        위에 레포 주소를 입력하고 <code>불러오기</code>를 눌러봐.<br>
+        예: <code>seunghun/pi-dev-team</code>
+      </div>
+    </div>
+
+    <div class="recent-commits" id="commitsSection" style="display:none;">
+      <h2>최근 커밋</h2>
+      <div id="commitsList"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://api.github.com';
+    let currentRepo = '';
+
+    async function loadRepo() {
+      const input = document.getElementById('repoInput').value.trim();
+      if (!input || !input.includes('/')) {
+        alert('owner/repo 형식으로 입력해줘! 예: seunghun/pi-dev-team');
+        return;
+      }
+      currentRepo = input;
+
+      // Save to URL for sharing
+      window.location.hash = input;
+
+      const treeContainer = document.getElementById('treeContainer');
+      treeContainer.innerHTML = '<div class="loading"><div class="spinner"></div><span>불러오는 중...</span></div>';
+
+      try {
+        const [tree, commits, contributors] = await Promise.all([
+          fetchTree(),
+          fetchCommits(),
+          fetchContributors()
+        ]);
+
+        renderStats(tree, commits, contributors);
+        renderTree(tree);
+        renderCommits(commits);
+      } catch (err) {
+        treeContainer.innerHTML = `
+          <div class="error-msg">
+            레포를 불러올 수 없어.<br>
+            주소가 맞는지, 레포가 public인지 확인해봐.<br><br>
+            <code>${currentRepo}</code>
+          </div>`;
+      }
+    }
+
+    async function fetchTree() {
+      const res = await fetch(`${API}/repos/${currentRepo}/git/trees/main?recursive=1`);
+      if (!res.ok) {
+        // try 'master' branch
+        const res2 = await fetch(`${API}/repos/${currentRepo}/git/trees/master?recursive=1`);
+        if (!res2.ok) throw new Error('Cannot fetch tree');
+        return res2.json();
+      }
+      return res.json();
+    }
+
+    async function fetchCommits() {
+      const res = await fetch(`${API}/repos/${currentRepo}/commits?per_page=10`);
+      if (!res.ok) return [];
+      return res.json();
+    }
+
+    async function fetchContributors() {
+      const res = await fetch(`${API}/repos/${currentRepo}/contributors?per_page=10`);
+      if (!res.ok) return [];
+      return res.json();
+    }
+
+    function renderStats(tree, commits, contributors) {
+      const files = tree.tree ? tree.tree.filter(t => t.type === 'blob').length : 0;
+      const folders = tree.tree ? tree.tree.filter(t => t.type === 'tree').length : 0;
+
+      document.getElementById('fileCount').textContent = files;
+      document.getElementById('folderCount').textContent = folders;
+      document.getElementById('commitCount').textContent = commits.length ? `${commits.length}+` : '0';
+      document.getElementById('contributorCount').textContent = contributors.length || 0;
+      document.getElementById('stats').style.display = 'grid';
+    }
+
+    function buildTreeStructure(flatTree) {
+      const root = { name: currentRepo.split('/')[1], children: {}, type: 'tree' };
+
+      flatTree.forEach(item => {
+        const parts = item.path.split('/');
+        let current = root;
+
+        parts.forEach((part, i) => {
+          if (!current.children[part]) {
+            current.children[part] = {
+              name: part,
+              children: {},
+              type: i === parts.length - 1 ? item.type : 'tree',
+              path: parts.slice(0, i + 1).join('/'),
+              size: item.size || 0
+            };
+          }
+          current = current.children[part];
+        });
+      });
+
+      return root;
+    }
+
+    function getFileIcon(name) {
+      const ext = name.split('.').pop().toLowerCase();
+      const icons = {
+        'md': '📝', 'html': '🌐', 'css': '🎨', 'js': '⚡',
+        'jsx': '⚛️', 'ts': '💎', 'tsx': '💎', 'py': '🐍',
+        'json': '📦', 'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️',
+        'gif': '🖼️', 'svg': '🖼️', 'gitignore': '🚫',
+        'txt': '📄', 'csv': '📊', 'pdf': '📕'
+      };
+      return icons[ext] || '📄';
+    }
+
+    function getMemberColor(path) {
+      const topFolder = path.split('/')[0];
+      const members = ['승훈', '채빈', '예인'];
+      for (const m of members) {
+        if (topFolder.includes(m)) return m;
+      }
+      return '';
+    }
+
+    function formatSize(bytes) {
+      if (!bytes) return '';
+      if (bytes < 1024) return `${bytes}B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+    }
+
+    function renderTree(data) {
+      const container = document.getElementById('treeContainer');
+
+      if (!data.tree || data.tree.length === 0) {
+        container.innerHTML = '<div class="error-msg">레포가 비어있어. 뭐라도 올려봐!</div>';
+        return;
+      }
+
+      const tree = buildTreeStructure(data.tree);
+      let html = `
+        <div class="tree-header">
+          <h2>📂 ${currentRepo}</h2>
+          <span class="branch-tag">main</span>
+        </div>
+        <div class="member-colors">
+      `;
+
+      function renderNode(node, depth = 0) {
+        const entries = Object.values(node.children);
+        // folders first, then files, alphabetical
+        entries.sort((a, b) => {
+          if (a.type === 'tree' && b.type !== 'tree') return -1;
+          if (a.type !== 'tree' && b.type === 'tree') return 1;
+          return a.name.localeCompare(b.name);
+        });
+
+        entries.forEach(entry => {
+          const indentClass = depth > 0 ? ` indent${depth > 1 ? `-${Math.min(depth, 3)}` : ''}` : '';
+          const memberClass = getMemberColor(entry.path);
+          const isFolder = entry.type === 'tree';
+          const icon = isFolder ? '📁' : getFileIcon(entry.name);
+          const meta = isFolder ? '' : formatSize(entry.size);
+          const ghUrl = `https://github.com/${currentRepo}/${isFolder ? 'tree' : 'blob'}/main/${entry.path}`;
+
+          html += `
+            <a class="tree-item ${isFolder ? 'folder' : 'file'}${indentClass} ${memberClass}"
+               href="${ghUrl}" target="_blank" rel="noopener">
+              <span class="icon">${icon}</span>
+              <span class="name">${entry.name}${isFolder ? '/' : ''}</span>
+              <span class="meta">${meta}</span>
+            </a>`;
+
+          if (isFolder) {
+            renderNode(entry, depth + 1);
+          }
+        });
+      }
+
+      renderNode(tree);
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function renderCommits(commits) {
+      if (!commits.length) return;
+
+      const section = document.getElementById('commitsSection');
+      const list = document.getElementById('commitsList');
+      section.style.display = 'block';
+
+      list.innerHTML = commits.map(c => {
+        const author = c.author || {};
+        const date = new Date(c.commit.author.date);
+        const timeAgo = getTimeAgo(date);
+        const hash = c.sha.substring(0, 7);
+
+        return `
+          <div class="commit-item">
+            <img class="commit-avatar" src="${author.avatar_url || ''}" alt=""
+                 onerror="this.style.display='none'" />
+            <div class="commit-info">
+              <div class="commit-msg">${escapeHtml(c.commit.message.split('\n')[0])}</div>
+              <div class="commit-meta">
+                <strong>${escapeHtml(c.commit.author.name)}</strong> · ${timeAgo}
+              </div>
+            </div>
+            <span class="commit-hash">${hash}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      const intervals = [
+        [31536000, '년'], [2592000, '개월'], [86400, '일'],
+        [3600, '시간'], [60, '분'], [1, '초']
+      ];
+      for (const [secs, label] of intervals) {
+        const count = Math.floor(seconds / secs);
+        if (count >= 1) return `${count}${label} 전`;
+      }
+      return '방금';
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Load from URL hash on page load
+    window.addEventListener('load', () => {
+      const hash = window.location.hash.slice(1);
+      if (hash) {
+        document.getElementById('repoInput').value = hash;
+        loadRepo();
+      }
+    });
+  </script>
+</body>
+</html>
