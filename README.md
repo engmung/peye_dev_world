@@ -1,5 +1,7 @@
 # 🔥 피아이개발팀 — 깃허브 놀이터
 
+🌐 **[레포 탐색기 바로가기 →](https://engmung.github.io/peye_dev_world/)**
+
 > 코딩 에이전트와 함께 깃/깃허브를 몸으로 배우는 일주일 실험
 
 ## 👋 우리는
@@ -46,7 +48,7 @@
 
 ```bash
 # 깃허브에서 레포 처음 가져오기 (맨 처음 한 번만)
-git clone https://github.com/[레포주소].git
+git clone https://github.com/engmung/peye_dev_world.git
 
 # 지금 내 상태 확인 (수시로 쳐봐)
 git status
@@ -101,7 +103,7 @@ git push --force   # ← 이거 절대 금지. 다른 사람 기록 날아감
 ## 📂 폴더 구조
 
 ```
-피아이개발팀/
+peye_dev_world/
 ├── README.md          ← 지금 보고 있는 이 문서
 ├── .gitignore         ← 올리면 안 되는 파일 목록
 ├── index.html         ← 레포 구조 시각화 (GitHub Pages)
@@ -112,9 +114,11 @@ git push --force   # ← 이거 절대 금지. 다른 사람 기록 날아감
 
 ## 🔗 레포 구조 보기
 
-GitHub Pages 배포 후 → `https://[유저이름].github.io/피아이개발팀/`
+GitHub Pages → [https://engmung.github.io/peye_dev_world/](https://engmung.github.io/peye_dev_world/)
 
 에서 실시간 폴더 구조를 트리 형태로 볼 수 있어.
+
+> `index.html` 페이지에서 레포 주소 **`engmung/peye_dev_world`** 를 입력하면 돼!
 
 ## 📝 기록
 
