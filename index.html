@@ -7,22 +7,22 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --surface-hover: #1a1a26;
-      --border: #2a2a3a;
-      --text: #e4e4ef;
-      --text-dim: #7a7a8f;
+      --bg: #07070e;
+      --surface: #0f0f1a;
+      --surface2: #151522;
+      --border: #252535;
+      --text: #e2e2f0;
+      --text-dim: #6a6a85;
       --accent: #ff6b35;
-      --accent-glow: rgba(255, 107, 53, 0.15);
-      --green: #4ade80;
-      --blue: #60a5fa;
-      --purple: #c084fc;
-      --yellow: #fbbf24;
+      --accent-glow: rgba(255,107,53,0.18);
+      --c승훈: #ff6b35;
+      --c채빈: #c084fc;
+      --c예인: #4ade80;
+      --cglow승훈: rgba(255,107,53,0.25);
+      --cglow채빈: rgba(192,132,252,0.25);
+      --cglow예인: rgba(74,222,128,0.25);
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
       background: var(--bg);
       color: var(--text);
@@ -31,369 +31,233 @@
       overflow-x: hidden;
     }
 
-    .noise {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
+    /* BG decoration */
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,107,53,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,107,53,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
     }
-
     .glow-orb {
-      position: fixed;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-      top: -200px; right: -200px;
-      pointer-events: none;
-      z-index: 0;
-      animation: float 8s ease-in-out infinite;
+      position: fixed; width:700px; height:700px; border-radius:50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+      top:-250px; right:-250px; pointer-events:none; z-index:0;
+      animation: float 10s ease-in-out infinite;
     }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(-30px, 20px); }
+    .glow-orb2 {
+      position:fixed; width:500px; height:500px; border-radius:50%;
+      background: radial-gradient(circle, rgba(192,132,252,0.08) 0%, transparent 65%);
+      bottom:-200px; left:-100px; pointer-events:none; z-index:0;
     }
+    @keyframes float { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,25px)} }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 24px;
-    }
+    /* Layout */
+    .container { position:relative; z-index:1; max-width:960px; margin:0 auto; padding:56px 24px 80px; }
 
-    header {
-      margin-bottom: 48px;
-    }
-
+    /* Header */
+    header { margin-bottom: 48px; }
     .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 12px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:12px; margin-bottom:14px;
     }
-
     header h1 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.5px;
+      font-family:'JetBrains Mono', monospace;
+      font-size:2.2rem; font-weight:700; color:var(--accent);
+      letter-spacing:-1px;
     }
-
     .gh-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 20px;
-      transition: color 0.2s, border-color 0.2s;
+      display:inline-flex; align-items:center; gap:8px;
+      font-family:'JetBrains Mono', monospace; font-size:0.78rem;
+      color:var(--text-dim); text-decoration:none;
+      border:1px solid var(--border); padding:6px 14px;
+      border-radius:20px; transition:all 0.2s;
     }
-
-    .gh-link:hover {
-      color: var(--text);
-      border-color: var(--accent);
+    .gh-link:hover { color:var(--accent); border-color:var(--accent); }
+    header .sub {
+      color:var(--text-dim); font-size:0.9rem; line-height:1.7;
+      margin-bottom:16px;
     }
-
-    header p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-      line-height: 1.6;
+    .members { display:flex; gap:10px; flex-wrap:wrap; }
+    .badge {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:0.78rem; font-family:'JetBrains Mono', monospace;
+      padding:5px 14px; border-radius:20px; border:1px solid;
+      transition: box-shadow 0.2s;
     }
+    .badge:hover { box-shadow: 0 0 12px var(--cglow, #fff2); }
+    .badge.승훈 { color:var(--c승훈); border-color:rgba(255,107,53,0.3); background:rgba(255,107,53,0.06); --cglow:var(--cglow승훈); }
+    .badge.채빈 { color:var(--c채빈); border-color:rgba(192,132,252,0.3); background:rgba(192,132,252,0.06); --cglow:var(--cglow채빈); }
+    .badge.예인 { color:var(--c예인); border-color:rgba(74,222,128,0.3); background:rgba(74,222,128,0.06); --cglow:var(--cglow예인); }
+    .member-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
 
-    .members {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .member-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid;
-    }
-
-    .member-badge.승훈 { color: var(--accent); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.05); }
-    .member-badge.채빈 { color: var(--purple); border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.05); }
-    .member-badge.예인 { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.05); }
-
+    /* Stat cards */
     .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 32px;
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:12px; margin-bottom:36px;
     }
-
     .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      transition: border-color 0.2s;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:18px 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .stat-card .lbl {
+      font-size:0.7rem; color:var(--text-dim);
+      text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;
+    }
+    .stat-card .val {
+      font-family:'JetBrains Mono', monospace;
+      font-size:1.6rem; font-weight:700; color:var(--text);
     }
 
-    .stat-card:hover {
-      border-color: var(--accent);
+    /* Section */
+    .section { margin-bottom:28px; }
+    .section-title {
+      font-family:'JetBrains Mono', monospace;
+      font-size:0.75rem; font-weight:600;
+      color:var(--text-dim); letter-spacing:2px; text-transform:uppercase;
+      margin-bottom:14px; display:flex; align-items:center; gap:10px;
+    }
+    .section-title::after {
+      content:''; flex:1; height:1px; background:var(--border);
     }
 
-    .stat-card .label {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
+    /* Panel */
+    .panel {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:24px; overflow:hidden;
     }
 
-    .stat-card .value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
+    /* Contribution bars */
+    .contrib-list { display:flex; flex-direction:column; gap:14px; }
+    .contrib-row { display:flex; align-items:center; gap:14px; }
+    .contrib-name {
+      font-family:'JetBrains Mono', monospace; font-size:0.82rem;
+      width:56px; flex-shrink:0;
+    }
+    .contrib-bar-wrap { flex:1; background:var(--border); border-radius:4px; height:10px; overflow:hidden; }
+    .contrib-bar {
+      height:100%; border-radius:4px;
+      transition:width 1s cubic-bezier(0.16,1,0.3,1);
+    }
+    .contrib-count {
+      font-family:'JetBrains Mono', monospace; font-size:0.75rem;
+      color:var(--text-dim); width:48px; text-align:right; flex-shrink:0;
     }
 
-    .refresh-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
+    /* Timeline SVG */
+    .timeline-wrap { overflow-x:auto; padding-bottom:8px; }
+    #timelineSvg { display:block; width:100%; }
+
+    /* Heatmap */
+    .heatmap-wrap { overflow-x:auto; }
+    .heatmap-grid { display:flex; gap:3px; }
+    .heatmap-col { display:flex; flex-direction:column; gap:3px; }
+    .heatmap-cell {
+      width:12px; height:12px; border-radius:2px;
+      background:var(--border); transition:transform 0.1s;
+    }
+    .heatmap-cell:hover { transform:scale(1.4); }
+    .heatmap-cell.lv1 { background:rgba(255,107,53,0.2); }
+    .heatmap-cell.lv2 { background:rgba(255,107,53,0.45); }
+    .heatmap-cell.lv3 { background:rgba(255,107,53,0.7); }
+    .heatmap-cell.lv4 { background:rgba(255,107,53,0.95); }
+    .heatmap-labels { display:flex; gap:3px; margin-top:6px; }
+    .heatmap-labels span {
+      font-family:'JetBrains Mono', monospace; font-size:0.65rem;
+      color:var(--text-dim); width:12px; text-align:center;
     }
 
-    .refresh-bar span {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-      flex: 1;
-    }
-
-    .refresh-btn {
-      background: transparent;
-      color: var(--text-dim);
-      border: 1px solid var(--border);
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-
-    .refresh-btn:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    .tree-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      min-height: 200px;
-    }
-
-    .tree-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tree-header h2 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-dim);
-    }
-
-    .tree-header .branch-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      background: rgba(74, 222, 128, 0.1);
-      color: var(--green);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(74, 222, 128, 0.2);
-    }
-
-    .tree-item {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.15s;
-      text-decoration: none;
-      color: var(--text);
-    }
-
-    .tree-item:hover {
-      background: var(--surface-hover);
-    }
-
-    .tree-item .icon {
-      width: 20px;
-      margin-right: 10px;
-      font-size: 0.9rem;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .tree-item .name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      flex: 1;
-    }
-
-    .tree-item .meta {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .tree-item.folder .name { color: var(--blue); }
-    .tree-item.folder .icon { color: var(--yellow); }
-    .tree-item.file .icon { color: var(--text-dim); }
-
-    .indent { padding-left: 24px; }
-    .indent-2 { padding-left: 48px; }
-    .indent-3 { padding-left: 72px; }
-
-    /* 멤버 폴더 색상 */
-    .member-colors .승훈 { border-left: 3px solid var(--accent); padding-left: 9px; }
-    .member-colors .채빈 { border-left: 3px solid var(--purple); padding-left: 9px; }
-    .member-colors .예인 { border-left: 3px solid var(--green); padding-left: 9px; }
-
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 0;
-      color: var(--text-dim);
-      gap: 16px;
-    }
-
-    .loading .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .loading span {
-      font-size: 0.85rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .error-msg {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      line-height: 1.8;
-    }
-
-    .recent-commits {
-      margin-top: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-    }
-
-    .recent-commits h2 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
+    /* Commit feed */
+    .commit-feed { display:flex; flex-direction:column; }
     .commit-item {
-      display: flex;
-      align-items: flex-start;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(42, 42, 58, 0.5);
-      gap: 12px;
+      display:flex; align-items:flex-start; gap:14px;
+      padding:12px 0; border-bottom:1px solid rgba(37,37,53,0.6);
+      position:relative;
     }
-
-    .commit-item:last-child { border-bottom: none; }
-
-    .commit-avatar {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: var(--border);
-    }
-
-    .commit-info { flex: 1; min-width: 0; }
-
+    .commit-item:last-child { border-bottom:none; }
+    .commit-avatar { width:28px; height:28px; border-radius:50%; flex-shrink:0; background:var(--border); }
+    .commit-body { flex:1; min-width:0; }
     .commit-msg {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-family:'JetBrains Mono', monospace; font-size:0.82rem;
+      color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-
-    .commit-meta {
-      font-size: 0.73rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .commit-meta strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
+    .commit-meta { font-size:0.72rem; color:var(--text-dim); margin-top:3px; }
+    .commit-meta strong { font-weight:600; }
     .commit-hash {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.73rem;
-      color: var(--accent);
-      flex-shrink: 0;
-      opacity: 0.7;
+      font-family:'JetBrains Mono', monospace; font-size:0.72rem;
+      color:var(--accent); opacity:0.7; flex-shrink:0; align-self:center;
+    }
+    .member-line {
+      position:absolute; left:0; top:0; bottom:0; width:2px; border-radius:2px;
+    }
+    .commit-item { padding-left:14px; }
+
+    /* File tree */
+    .tree-item {
+      display:flex; align-items:center; padding:7px 10px; border-radius:6px;
+      cursor:pointer; text-decoration:none; color:var(--text);
+      transition:background 0.12s;
+    }
+    .tree-item:hover { background:var(--surface2); }
+    .tree-item .ico { width:20px; margin-right:10px; font-size:0.88rem; text-align:center; flex-shrink:0; }
+    .tree-item .nm { font-family:'JetBrains Mono', monospace; font-size:0.83rem; flex:1; }
+    .tree-item .sz { font-size:0.72rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+    .tree-item.folder .nm { color:#60a5fa; }
+    .tree-item.folder .ico { color:#fbbf24; }
+    .ind1 { padding-left:30px; } .ind2 { padding-left:54px; } .ind3 { padding-left:78px; }
+    .mem-승훈 { border-left:2px solid var(--c승훈); padding-left:8px; }
+    .mem-채빈 { border-left:2px solid var(--c채빈); padding-left:8px; }
+    .mem-예인 { border-left:2px solid var(--c예인); padding-left:8px; }
+
+    /* Refresh */
+    .top-bar { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+    .top-bar .ts { font-size:0.73rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace; flex:1; }
+    .refresh-btn {
+      background:transparent; color:var(--text-dim); border:1px solid var(--border);
+      padding:6px 16px; border-radius:8px; font-size:0.78rem; cursor:pointer;
+      transition:all 0.2s; font-family:'Noto Sans KR',sans-serif;
+    }
+    .refresh-btn:hover { color:var(--accent); border-color:var(--accent); }
+
+    /* Loading */
+    .loading {
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; padding:64px 0; color:var(--text-dim); gap:16px;
+    }
+    .spinner {
+      width:30px; height:30px; border:2.5px solid var(--border);
+      border-top-color:var(--accent); border-radius:50%;
+      animation:spin 0.75s linear infinite;
+    }
+    .loading span { font-size:0.8rem; font-family:'JetBrains Mono', monospace; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* 2-col grid */
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media(max-width:700px) {
+      .grid2 { grid-template-columns:1fr; }
+      .container { padding:32px 16px 60px; }
+      header h1 { font-size:1.6rem; }
+      .stats { grid-template-columns:1fr 1fr; }
     }
 
-    .last-updated {
-      text-align: right;
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: 16px;
-    }
-
-    @media (max-width: 600px) {
-      .container { padding: 32px 16px; }
-      header h1 { font-size: 1.4rem; }
-      .stats { grid-template-columns: 1fr 1fr; }
+    /* Tooltip */
+    .tip {
+      position:fixed; background:#1e1e30; border:1px solid var(--border);
+      padding:6px 12px; border-radius:6px; font-size:0.72rem;
+      font-family:'JetBrains Mono', monospace; color:var(--text);
+      pointer-events:none; display:none; z-index:999;
     }
   </style>
 </head>
 <body>
-  <div class="noise"></div>
+  <div class="bg-grid"></div>
   <div class="glow-orb"></div>
+  <div class="glow-orb2"></div>
+  <div class="tip" id="tip"></div>
 
   <div class="container">
     <header>
@@ -403,271 +267,488 @@
           ⭐ engmung/peye_dev_world
         </a>
       </div>
-      <p>깃허브에서 같이 놀면서 배우는 중. 이 페이지는 레포의 실시간 구조를 보여줘.</p>
+      <p class="sub">깃허브에서 같이 놀면서 배우는 중. 커밋 하나하나가 기록으로 남아.</p>
       <div class="members">
-        <span class="member-badge 승훈">🔥 승훈</span>
-        <span class="member-badge 채빈">💜 채빈</span>
-        <span class="member-badge 예인">💚 예인</span>
+        <span class="badge 승훈"><span class="member-dot"></span>승훈</span>
+        <span class="badge 채빈"><span class="member-dot"></span>채빈</span>
+        <span class="badge 예인"><span class="member-dot"></span>예인</span>
       </div>
     </header>
 
-    <div class="stats" id="stats" style="display:none;">
-      <div class="stat-card">
-        <div class="label">파일</div>
-        <div class="value" id="fileCount">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">폴더</div>
-        <div class="value" id="folderCount">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">커밋</div>
-        <div class="value" id="commitCount">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">기여자</div>
-        <div class="value" id="contributorCount">0</div>
-      </div>
-    </div>
-
-    <div class="refresh-bar">
-      <span id="lastUpdated"></span>
-      <button class="refresh-btn" onclick="loadRepo()">↻ 새로고침</button>
-    </div>
-
-    <div class="tree-container" id="treeContainer">
-      <div class="loading">
-        <div class="spinner"></div>
-        <span>불러오는 중...</span>
-      </div>
-    </div>
-
-    <div class="recent-commits" id="commitsSection" style="display:none;">
-      <h2>최근 커밋</h2>
-      <div id="commitsList"></div>
+    <div id="mainContent">
+      <div class="loading"><div class="spinner"></div><span>불러오는 중...</span></div>
     </div>
   </div>
 
   <script>
     const API = 'https://api.github.com';
     const REPO = 'engmung/peye_dev_world';
+    const MEMBERS = ['승훈','채빈','예인'];
+    const COLORS = { '승훈':'#ff6b35', '채빈':'#c084fc', '예인':'#4ade80' };
+    const UNKNOWN_COLOR = '#60a5fa';
 
+    // 커밋에 멤버 이름이 포함되어 있으면 해당 멤버로 판단
+    function getMember(commit) {
+      const name = (commit.commit.author.name || '').toLowerCase();
+      const login = (commit.author?.login || '').toLowerCase();
+      for (const m of MEMBERS) {
+        if (name.includes(m) || login.includes(m)) return m;
+      }
+      return null;
+    }
+
+    function getMemberColor(m) { return COLORS[m] || UNKNOWN_COLOR; }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function timeAgo(date) {
+      const s = Math.floor((Date.now() - date) / 1000);
+      for (const [sec, lbl] of [[31536000,'년'],[2592000,'개월'],[86400,'일'],[3600,'시간'],[60,'분'],[1,'초']]) {
+        const c = Math.floor(s/sec);
+        if (c >= 1) return `${c}${lbl} 전`;
+      }
+      return '방금';
+    }
+
+    function fmtDate(date) {
+      return date.toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    }
+
+    function formatSize(b) {
+      if (!b) return '';
+      if (b < 1024) return `${b}B`;
+      if (b < 1048576) return `${(b/1024).toFixed(1)}KB`;
+      return `${(b/1048576).toFixed(1)}MB`;
+    }
+
+    // ─── Tooltip ──────────────────────────────────────────
+    const tip = document.getElementById('tip');
+    function showTip(e, text) {
+      tip.textContent = text; tip.style.display = 'block';
+      moveTip(e);
+    }
+    function moveTip(e) {
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top  = (e.clientY - 28) + 'px';
+    }
+    function hideTip() { tip.style.display = 'none'; }
+    document.addEventListener('mousemove', e => { if (tip.style.display==='block') moveTip(e); });
+
+    // ─── Fetch ────────────────────────────────────────────
+    async function fetchAll() {
+      const [treeRes, commitsRes, contribRes] = await Promise.all([
+        fetch(`${API}/repos/${REPO}/git/trees/main?recursive=1`),
+        fetch(`${API}/repos/${REPO}/commits?per_page=100`),
+        fetch(`${API}/repos/${REPO}/contributors?per_page=20`),
+      ]);
+      const [tree, commits, contributors] = await Promise.all([
+        treeRes.ok ? treeRes.json() : {tree:[]},
+        commitsRes.ok ? commitsRes.json() : [],
+        contribRes.ok ? contribRes.json() : [],
+      ]);
+      return { tree, commits, contributors };
+    }
+
+    // ─── Main render ──────────────────────────────────────
     async function loadRepo() {
-      document.getElementById('lastUpdated').textContent = '';
-      const treeContainer = document.getElementById('treeContainer');
-      treeContainer.innerHTML = '<div class="loading"><div class="spinner"></div><span>불러오는 중...</span></div>';
-      document.getElementById('stats').style.display = 'none';
-      document.getElementById('commitsSection').style.display = 'none';
+      document.getElementById('mainContent').innerHTML =
+        '<div class="loading"><div class="spinner"></div><span>불러오는 중...</span></div>';
 
       try {
-        const [tree, commits, contributors] = await Promise.all([
-          fetchTree(),
-          fetchCommits(),
-          fetchContributors()
-        ]);
-
-        renderStats(tree, commits, contributors);
-        renderTree(tree);
-        renderCommits(commits);
-
-        const now = new Date();
-        document.getElementById('lastUpdated').textContent =
-          `마지막 업데이트: ${now.toLocaleTimeString('ko-KR')}`;
-      } catch (err) {
-        treeContainer.innerHTML = `
-          <div class="error-msg">
-            레포를 불러올 수 없어.<br>
-            잠시 후 다시 시도해봐.<br><br>
-            <code>${REPO}</code>
-          </div>`;
+        const { tree, commits, contributors } = await fetchAll();
+        renderAll(tree, commits, contributors);
+      } catch(e) {
+        document.getElementById('mainContent').innerHTML =
+          `<div class="loading"><span style="color:#ff6b35">레포를 불러올 수 없어. 잠시 후 다시 시도해봐.</span></div>`;
       }
     }
 
-    async function fetchTree() {
-      const res = await fetch(`${API}/repos/${REPO}/git/trees/main?recursive=1`);
-      if (!res.ok) throw new Error('Cannot fetch tree');
-      return res.json();
+    function renderAll(tree, commits, contributors) {
+      // Classify commits by member
+      const memberCommits = {};
+      MEMBERS.forEach(m => memberCommits[m] = []);
+      const otherCommits = [];
+      commits.forEach(c => {
+        const m = getMember(c);
+        if (m) memberCommits[m].push(c);
+        else otherCommits.push(c);
+      });
+
+      // Stats
+      const files = (tree.tree||[]).filter(t=>t.type==='blob').length;
+      const folders = (tree.tree||[]).filter(t=>t.type==='tree').length;
+
+      const now = new Date();
+      const nowStr = now.toLocaleTimeString('ko-KR');
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="stats" id="stats">
+          <div class="stat-card"><div class="lbl">커밋</div><div class="val" id="sv-commits">0</div></div>
+          <div class="stat-card"><div class="lbl">파일</div><div class="val">${files}</div></div>
+          <div class="stat-card"><div class="lbl">폴더</div><div class="val">${folders}</div></div>
+          <div class="stat-card"><div class="lbl">기여자</div><div class="val">${contributors.length}</div></div>
+        </div>
+
+        <div class="top-bar">
+          <span class="ts" id="tsLabel">마지막 업데이트: ${nowStr}</span>
+          <button class="refresh-btn" onclick="loadRepo()">↻ 새로고침</button>
+        </div>
+
+        <!-- 기여도 + 타임라인 -->
+        <div class="grid2" style="margin-bottom:28px;">
+          <div>
+            <div class="section-title">기여도</div>
+            <div class="panel">
+              <div class="contrib-list" id="contribList"></div>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">활동 히트맵</div>
+            <div class="panel">
+              <div class="heatmap-wrap" id="heatmapWrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 커밋 타임라인 -->
+        <div class="section">
+          <div class="section-title">커밋 타임라인</div>
+          <div class="panel" style="padding:20px 16px;">
+            <div class="timeline-wrap">
+              <svg id="timelineSvg"></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 파일 트리 + 최근 커밋 -->
+        <div class="grid2">
+          <div>
+            <div class="section-title">파일 구조</div>
+            <div class="panel" id="treePanel"></div>
+          </div>
+          <div>
+            <div class="section-title">최근 커밋</div>
+            <div class="panel" style="padding:8px 16px;" id="commitPanel"></div>
+          </div>
+        </div>
+      `;
+
+      // Animate commit counter
+      animateCount('sv-commits', commits.length);
+
+      renderContrib(memberCommits, otherCommits);
+      renderHeatmap(commits);
+      renderTimeline(commits, memberCommits);
+      renderTree(tree);
+      renderCommits(commits.slice(0,12), memberCommits);
     }
 
-    async function fetchCommits() {
-      const res = await fetch(`${API}/repos/${REPO}/commits?per_page=10`);
-      if (!res.ok) return [];
-      return res.json();
+    // ─── Counter animation ────────────────────────────────
+    function animateCount(id, target) {
+      const el = document.getElementById(id);
+      let cur = 0;
+      const step = Math.ceil(target / 30);
+      const t = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        el.textContent = cur;
+        if (cur >= target) clearInterval(t);
+      }, 30);
     }
 
-    async function fetchContributors() {
-      const res = await fetch(`${API}/repos/${REPO}/contributors?per_page=10`);
-      if (!res.ok) return [];
-      return res.json();
+    // ─── Contribution bars ────────────────────────────────
+    function renderContrib(memberCommits, otherCommits) {
+      const el = document.getElementById('contribList');
+      if (!el) return;
+
+      const total = Object.values(memberCommits).reduce((a,v)=>a+v.length,0) + otherCommits.length;
+      if (total === 0) { el.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;text-align:center;padding:16px">커밋이 없어</div>'; return; }
+
+      const rows = MEMBERS.map(m => ({ name:m, count:memberCommits[m].length, color:COLORS[m] }));
+      if (otherCommits.length) rows.push({ name:'기타', count:otherCommits.length, color:UNKNOWN_COLOR });
+
+      rows.sort((a,b) => b.count - a.count);
+      const maxCount = rows[0]?.count || 1;
+
+      el.innerHTML = rows.map(r => `
+        <div class="contrib-row">
+          <span class="contrib-name" style="color:${r.color}">${r.name}</span>
+          <div class="contrib-bar-wrap">
+            <div class="contrib-bar" style="width:0%;background:${r.color}" data-w="${Math.round(r.count/maxCount*100)}"></div>
+          </div>
+          <span class="contrib-count">${r.count}개</span>
+        </div>
+      `).join('');
+
+      // Animate bars
+      setTimeout(() => {
+        el.querySelectorAll('.contrib-bar').forEach(b => {
+          b.style.width = b.dataset.w + '%';
+        });
+      }, 80);
     }
 
-    function renderStats(tree, commits, contributors) {
-      const files = tree.tree ? tree.tree.filter(t => t.type === 'blob').length : 0;
-      const folders = tree.tree ? tree.tree.filter(t => t.type === 'tree').length : 0;
+    // ─── Heatmap ──────────────────────────────────────────
+    function renderHeatmap(commits) {
+      const el = document.getElementById('heatmapWrap');
+      if (!el) return;
 
-      document.getElementById('fileCount').textContent = files;
-      document.getElementById('folderCount').textContent = folders;
-      document.getElementById('commitCount').textContent = commits.length ? `${commits.length}+` : '0';
-      document.getElementById('contributorCount').textContent = contributors.length || 0;
-      document.getElementById('stats').style.display = 'grid';
+      // Build date → count map (last 12 weeks = 84 days)
+      const dateMap = {};
+      commits.forEach(c => {
+        const d = new Date(c.commit.author.date);
+        const key = d.toISOString().slice(0,10);
+        dateMap[key] = (dateMap[key]||0) + 1;
+      });
+
+      const today = new Date(); today.setHours(0,0,0,0);
+      const WEEKS = 14;
+      const DAYS = WEEKS * 7;
+
+      // Start from the beginning of this week
+      const startDay = new Date(today);
+      startDay.setDate(today.getDate() - DAYS + 1);
+
+      const maxVal = Math.max(1, ...Object.values(dateMap));
+
+      // Build columns (weeks), each column is 7 cells (Sun→Sat)
+      const cols = [];
+      for (let w = 0; w < WEEKS; w++) {
+        const col = [];
+        for (let d = 0; d < 7; d++) {
+          const date = new Date(startDay);
+          date.setDate(startDay.getDate() + w*7 + d);
+          if (date > today) { col.push(null); continue; }
+          const key = date.toISOString().slice(0,10);
+          const cnt = dateMap[key] || 0;
+          col.push({ date, cnt, key });
+        }
+        cols.push(col);
+      }
+
+      let html = '<div class="heatmap-grid">';
+      cols.forEach(col => {
+        html += '<div class="heatmap-col">';
+        col.forEach(cell => {
+          if (!cell) { html += `<div class="heatmap-cell" style="opacity:0"></div>`; return; }
+          const ratio = cell.cnt / maxVal;
+          const lv = cell.cnt === 0 ? 0 : ratio < 0.25 ? 1 : ratio < 0.5 ? 2 : ratio < 0.75 ? 3 : 4;
+          html += `<div class="heatmap-cell lv${lv}"
+            data-date="${cell.key}" data-cnt="${cell.cnt}"
+            onmouseenter="showTip(event,'${cell.key}: ${cell.cnt}개 커밋')"
+            onmouseleave="hideTip()"></div>`;
+        });
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // Day labels (Mon, Wed, Fri)
+      html += '<div class="heatmap-labels">';
+      for (let i = 0; i < WEEKS; i++) {
+        const d = new Date(startDay); d.setDate(startDay.getDate() + i*7);
+        html += i % 2 === 0
+          ? `<span style="width:${12*7+3*6}px">${(d.getMonth()+1)}월</span>`
+          : '';
+      }
+      html += '</div>';
+
+      el.innerHTML = html;
     }
 
-    function buildTreeStructure(flatTree) {
-      const root = { name: REPO.split('/')[1], children: {}, type: 'tree' };
+    // ─── Timeline SVG ─────────────────────────────────────
+    function renderTimeline(commits, memberCommits) {
+      const svg = document.getElementById('timelineSvg');
+      if (!svg || !commits.length) return;
 
-      flatTree.forEach(item => {
-        const parts = item.path.split('/');
-        let current = root;
+      const WIDTH = svg.parentElement.clientWidth || 800;
+      const LANE_H = 44;
+      const LANES = MEMBERS;
+      const PAD_L = 64, PAD_R = 20, PAD_T = 20, PAD_B = 20;
+      const H = PAD_T + LANE_H * LANES.length + PAD_B;
 
-        parts.forEach((part, i) => {
-          if (!current.children[part]) {
-            current.children[part] = {
-              name: part,
-              children: {},
-              type: i === parts.length - 1 ? item.type : 'tree',
-              path: parts.slice(0, i + 1).join('/'),
-              size: item.size || 0
-            };
-          }
-          current = current.children[part];
+      const dates = commits.map(c => new Date(c.commit.author.date).getTime());
+      const minT = Math.min(...dates);
+      const maxT = Math.max(...dates);
+      const rangeT = maxT - minT || 1;
+
+      function xOf(ts) {
+        return PAD_L + ((ts - minT) / rangeT) * (WIDTH - PAD_L - PAD_R);
+      }
+      function yOf(member) {
+        const idx = LANES.indexOf(member);
+        return PAD_T + idx * LANE_H + LANE_H / 2;
+      }
+
+      let g = `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${H}" viewBox="0 0 ${WIDTH} ${H}">`;
+      g += `<defs>`;
+      MEMBERS.forEach(m => {
+        g += `<radialGradient id="glow${m}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${COLORS[m]}" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="${COLORS[m]}" stop-opacity="0"/>
+        </radialGradient>`;
+      });
+      g += `</defs>`;
+
+      // Lane backgrounds + labels
+      LANES.forEach((m, i) => {
+        const y = PAD_T + i * LANE_H;
+        const isEven = i % 2 === 0;
+        if (isEven) g += `<rect x="0" y="${y}" width="${WIDTH}" height="${LANE_H}" fill="rgba(255,255,255,0.01)" rx="0"/>`;
+        // Label
+        g += `<text x="${PAD_L - 10}" y="${y + LANE_H/2 + 4}" text-anchor="end"
+          font-family="JetBrains Mono, monospace" font-size="11" fill="${COLORS[m]}">${m}</text>`;
+        // Lane line
+        g += `<line x1="${PAD_L}" y1="${y+LANE_H/2}" x2="${WIDTH-PAD_R}" y2="${y+LANE_H/2}"
+          stroke="${COLORS[m]}" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="4 6"/>`;
+      });
+
+      // Draw connecting line (overall timeline base)
+      g += `<line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${H-PAD_B}"
+        stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+      g += `<line x1="${WIDTH-PAD_R}" y1="${PAD_T}" x2="${WIDTH-PAD_R}" y2="${H-PAD_B}"
+        stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+
+      // Date ticks
+      const tickCount = 5;
+      for (let i = 0; i <= tickCount; i++) {
+        const ts = minT + (rangeT * i / tickCount);
+        const x = xOf(ts);
+        const label = fmtDate(new Date(ts));
+        g += `<line x1="${x}" y1="${PAD_T-6}" x2="${x}" y2="${H-PAD_B+6}"
+          stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+        g += `<text x="${x}" y="${H-PAD_B+18}" text-anchor="middle"
+          font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(255,255,255,0.25)">${label}</text>`;
+      }
+
+      // Dots per commit
+      MEMBERS.forEach(m => {
+        const mCommits = memberCommits[m] || [];
+        mCommits.forEach(c => {
+          const ts = new Date(c.commit.author.date).getTime();
+          const x = xOf(ts);
+          const y = yOf(m);
+          const col = COLORS[m];
+          const msg = c.commit.message.split('\n')[0].slice(0,30);
+          // glow ring
+          g += `<circle cx="${x}" cy="${y}" r="10" fill="url(#glow${m})"/>`;
+          // dot
+          g += `<circle cx="${x}" cy="${y}" r="5" fill="${col}" fill-opacity="0.9"
+            class="timeline-dot"
+            style="cursor:pointer"
+            onmouseenter="showTip(event,'${escapeHtml(msg).replace(/'/g,"&#39;")}')"
+            onmouseleave="hideTip()"/>`;
+          // inner highlight
+          g += `<circle cx="${x-1}" cy="${y-1}" r="1.5" fill="white" fill-opacity="0.5"/>`;
         });
       });
 
+      g += `</svg>`;
+      svg.outerHTML = g;
+    }
+
+    // ─── File tree ────────────────────────────────────────
+    function buildTree(flatTree) {
+      const root = { name:'root', children:{}, type:'tree' };
+      flatTree.forEach(item => {
+        const parts = item.path.split('/');
+        let cur = root;
+        parts.forEach((part, i) => {
+          if (!cur.children[part]) {
+            cur.children[part] = {
+              name:part, children:{}, path:parts.slice(0,i+1).join('/'),
+              type: i===parts.length-1 ? item.type : 'tree',
+              size: item.size||0
+            };
+          }
+          cur = cur.children[part];
+        });
+      });
       return root;
     }
 
-    function getFileIcon(name) {
+    function getIcon(name) {
       const ext = name.split('.').pop().toLowerCase();
-      const icons = {
-        'md': '📝', 'html': '🌐', 'css': '🎨', 'js': '⚡',
-        'jsx': '⚛️', 'ts': '💎', 'tsx': '💎', 'py': '🐍',
-        'json': '📦', 'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️',
-        'gif': '🖼️', 'svg': '🖼️', 'gitignore': '🚫',
-        'txt': '📄', 'csv': '📊', 'pdf': '📕'
-      };
-      return icons[ext] || '📄';
+      return { md:'📝', html:'🌐', css:'🎨', js:'⚡', jsx:'⚛️', ts:'💎', tsx:'💎',
+               py:'🐍', json:'📦', png:'🖼️', jpg:'🖼️', gif:'🖼️', svg:'🖼️',
+               gitignore:'🚫', txt:'📄', csv:'📊', pdf:'📕' }[ext] || '📄';
     }
 
-    function getMemberColor(path) {
-      const topFolder = path.split('/')[0];
-      const members = ['승훈', '채빈', '예인'];
-      for (const m of members) {
-        if (topFolder.includes(m)) return m;
-      }
-      return '';
-    }
-
-    function formatSize(bytes) {
-      if (!bytes) return '';
-      if (bytes < 1024) return `${bytes}B`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
-      return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+    function getMemberFromPath(path) {
+      const top = path.split('/')[0];
+      return MEMBERS.find(m => top.includes(m)) || '';
     }
 
     function renderTree(data) {
-      const container = document.getElementById('treeContainer');
+      const el = document.getElementById('treePanel');
+      if (!el || !data.tree?.length) { if(el) el.innerHTML='<div style="color:var(--text-dim);font-size:0.82rem;padding:8px">비어있어</div>'; return; }
 
-      if (!data.tree || data.tree.length === 0) {
-        container.innerHTML = '<div class="error-msg">레포가 비어있어. 뭐라도 올려봐!</div>';
-        return;
-      }
+      const tree = buildTree(data.tree.filter(t => !t.path.endsWith('.gitkeep')));
+      let html = '';
 
-      const tree = buildTreeStructure(data.tree);
-      let html = `
-        <div class="tree-header">
-          <h2>📂 ${REPO}</h2>
-          <span class="branch-tag">main</span>
-        </div>
-        <div class="member-colors">
-      `;
-
-      function renderNode(node, depth = 0) {
+      function walk(node, depth) {
         const entries = Object.values(node.children);
-        // .gitkeep 숨기기
-        const visible = entries.filter(e => e.name !== '.gitkeep');
-        // 폴더 먼저, 그다음 파일, 알파벳 순
-        visible.sort((a, b) => {
-          if (a.type === 'tree' && b.type !== 'tree') return -1;
-          if (a.type !== 'tree' && b.type === 'tree') return 1;
+        entries.sort((a,b) => {
+          if(a.type==='tree'&&b.type!=='tree') return -1;
+          if(a.type!=='tree'&&b.type==='tree') return 1;
           return a.name.localeCompare(b.name);
         });
-
-        visible.forEach(entry => {
-          const indentClass = depth > 0 ? ` indent${depth > 1 ? `-${Math.min(depth, 3)}` : ''}` : '';
-          const memberClass = getMemberColor(entry.path);
-          const isFolder = entry.type === 'tree';
-          const icon = isFolder ? '📁' : getFileIcon(entry.name);
-          const meta = isFolder ? '' : formatSize(entry.size);
-          const ghUrl = `https://github.com/${REPO}/${isFolder ? 'tree' : 'blob'}/main/${entry.path}`;
-
-          html += `
-            <a class="tree-item ${isFolder ? 'folder' : 'file'}${indentClass} ${memberClass}"
-               href="${ghUrl}" target="_blank" rel="noopener">
-              <span class="icon">${icon}</span>
-              <span class="name">${entry.name}${isFolder ? '/' : ''}</span>
-              <span class="meta">${meta}</span>
-            </a>`;
-
-          if (isFolder) {
-            renderNode(entry, depth + 1);
-          }
+        entries.forEach(e => {
+          const isDir = e.type==='tree';
+          const indent = depth > 0 ? ` ind${Math.min(depth,3)}` : '';
+          const mem = getMemberFromPath(e.path);
+          const memCls = mem ? ` mem-${mem}` : '';
+          const icon = isDir ? '📁' : getIcon(e.name);
+          const url = `https://github.com/${REPO}/${isDir?'tree':'blob'}/main/${e.path}`;
+          html += `<a class="tree-item ${isDir?'folder':'file'}${indent}${memCls}"
+            href="${url}" target="_blank" rel="noopener"
+            title="${e.path}">
+            <span class="ico">${icon}</span>
+            <span class="nm">${e.name}${isDir?'/':''}</span>
+            <span class="sz">${formatSize(e.size)}</span>
+          </a>`;
+          if (isDir) walk(e, depth+1);
         });
       }
 
-      renderNode(tree);
-      html += '</div>';
-      container.innerHTML = html;
+      walk(tree, 0);
+      el.innerHTML = html || '<div style="color:var(--text-dim)">비어있어</div>';
     }
 
-    function renderCommits(commits) {
-      if (!commits.length) return;
+    // ─── Commit feed ──────────────────────────────────────
+    function renderCommits(commits, memberCommits) {
+      const el = document.getElementById('commitPanel');
+      if (!el) return;
 
-      const section = document.getElementById('commitsSection');
-      const list = document.getElementById('commitsList');
-      section.style.display = 'block';
+      // Build lookup for member
+      const hashMember = {};
+      MEMBERS.forEach(m => (memberCommits[m]||[]).forEach(c => hashMember[c.sha] = m));
 
-      list.innerHTML = commits.map(c => {
+      el.innerHTML = commits.map(c => {
+        const m = hashMember[c.sha];
+        const col = m ? COLORS[m] : UNKNOWN_COLOR;
         const author = c.author || {};
-        const date = new Date(c.commit.author.date);
-        const timeAgo = getTimeAgo(date);
-        const hash = c.sha.substring(0, 7);
-
+        const hash = c.sha.substring(0,7);
+        const msg = c.commit.message.split('\n')[0];
         return `
-          <div class="commit-item">
-            <img class="commit-avatar" src="${author.avatar_url || ''}" alt=""
-                 onerror="this.style.display='none'" />
-            <div class="commit-info">
-              <div class="commit-msg">${escapeHtml(c.commit.message.split('\n')[0])}</div>
-              <div class="commit-meta">
-                <strong>${escapeHtml(c.commit.author.name)}</strong> · ${timeAgo}
-              </div>
+          <div class="commit-item" style="border-left:2px solid ${col};padding-left:12px">
+            <img class="commit-avatar" src="${author.avatar_url||''}" alt="" onerror="this.style.display='none'"/>
+            <div class="commit-body">
+              <div class="commit-msg">${escapeHtml(msg)}</div>
+              <div class="commit-meta"><strong style="color:${col}">${escapeHtml(c.commit.author.name)}</strong> · ${timeAgo(new Date(c.commit.author.date))}</div>
             </div>
             <span class="commit-hash">${hash}</span>
           </div>`;
       }).join('');
     }
 
-    function getTimeAgo(date) {
-      const seconds = Math.floor((new Date() - date) / 1000);
-      const intervals = [
-        [31536000, '년'], [2592000, '개월'], [86400, '일'],
-        [3600, '시간'], [60, '분'], [1, '초']
-      ];
-      for (const [secs, label] of intervals) {
-        const count = Math.floor(seconds / secs);
-        if (count >= 1) return `${count}${label} 전`;
-      }
-      return '방금';
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // 페이지 로드 시 자동으로 레포 불러오기
+    // ─── Init ─────────────────────────────────────────────
     window.addEventListener('load', loadRepo);
+    window.addEventListener('resize', () => {
+      // Re-render timeline on resize if data is available
+    });
   </script>
 </body>
 </html>
