@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weathering with You - Prayer Interaction</title>
+    <!-- MediaPipe 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --ui-opacity: 0.8;
+            --accent-color: #64b5f6; /* Weathering with You blue */
+            --glow-color: rgba(100, 181, 246, 0.8);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+        }
+
+        /* 전체 화면 비디오 */
+        #main-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* UI 레이어 */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 미니멀 웹캠 박스 */
+        .webcam-box {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 320px; /* 크기 2배 확대 */
+            height: 240px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        #input-video {
+            display: none;
+        }
+
+        #output-canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* MediaPipe에서 보내는 이미지는 자체적으로 반전 처리됨 */
+            opacity: 0.9;
+        }
+
+        /* 안내 문구 */
+        #instruction {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+            transition: opacity 1s ease;
+            text-align: center;
+            margin-top: -100px;
+        }
+
+        /* 하단 미니멀 게이지 (비디오 타임라인이 아닌 맑아지는 척도) */
+        .distance-gauge {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-color);
+            box-shadow: 0 0 15px var(--glow-color);
+            transition: width 0.1s ease-out;
+        }
+
+        /* 로딩 화면 */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 200;
+            letter-spacing: 4px;
+            font-size: 16px;
+            transition: opacity 1s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">HAND SENSORS INITIALIZING...</div>
+
+    <!-- 메인 배경 비디오 -->
+    <video id="main-video" playsinline muted preload="auto">
+        <source src="video.mp4" type="video/mp4">
+    </video>
+
+    <!-- UI 요소 -->
+    <div id="ui-layer">
+        <div id="instruction">두 손을 모아 기도해주세요</div>
+        
+        <div class="webcam-box">
+            <video id="input-video"></video>
+            <canvas id="output-canvas"></canvas>
+        </div>
+
+        <div class="distance-gauge">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('input-video');
+        const canvasElement = document.getElementById('output-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const mainVideo = document.getElementById('main-video');
+        const progressBar = document.getElementById('progress-bar');
+        const loader = document.getElementById('loader');
+        const instruction = document.getElementById('instruction');
+
+        let targetTime = 0;
+        let isHandsDetected = false;
+        let lastHandsRenderTime = Date.now();
+
+        // 부드러운 스크러빙을 위한 변수
+        let currentVideoTime = 0;
+
+        // MediaPipe 설정
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 2,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.65,
+            minTrackingConfidence: 0.65
+        });
+
+        hands.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 1280, /* 해상도 대폭 상향 */
+            height: 720
+        });
+
+        // 비디오 메타데이터가 로드되면 준비
+        mainVideo.addEventListener('loadedmetadata', () => {
+            currentVideoTime = 0;
+            targetTime = 0;
+            if(mainVideo.duration) {
+                mainVideo.currentTime = 0;
+            }
+        });
+
+        camera.start().then(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 1000);
+        });
+
+        function onResults(results) {
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 웹캠 원본 화면 출력(drawImage)을 제거하여 트래킹된 손만 보여줍니다.
+            canvasCtx.translate(canvasElement.width, 0);
+            canvasCtx.scale(-1, 1);
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length >= 2) {
+                isHandsDetected = true;
+                lastHandsRenderTime = Date.now();
+                instruction.style.opacity = '0'; // 안내 문구 숨기기
+
+                const hand1 = results.multiHandLandmarks[0];
+                const hand2 = results.multiHandLandmarks[1];
+                
+                // --- 1. 양손 전체 뼈대와 랜드마크 붉은색 굵게 그리기 ---
+                for (const landmarks of results.multiHandLandmarks) {
+                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
+                                   {color: '#FF0000', lineWidth: 8}); // 연결선 굵기를 8로 상향
+                    drawLandmarks(canvasCtx, landmarks, 
+                                  {color: '#FF0000', lineWidth: 2, radius: 5}); // 점 크기도 상향
+                }
+
+                const tip1 = hand1[8]; // 검지 끝
+                const tip2 = hand2[8];
+
+                // 반전된 캔버스 위에 그려야 하므로 좌표 계산
+                // 웹캠에서 보여지는 기준, MediaPipe의 x=0은 실제 웹캠의 왼쪽. 
+                // 우리는 좌우반전 캔버스에 그리기 때문에 캔버스 공간 내에서는 x 그대로 쓰면 화면상에서는 맞게 그려집니다.
+                const p1x = tip1.x * canvasElement.width;
+                const p1y = tip1.y * canvasElement.height;
+                const p2x = tip2.x * canvasElement.width;
+                const p2y = tip2.y * canvasElement.height;
+
+                // 거리 계산
+                const dx = p1x - p2x;
+                const dy = p1y - p2y;
+                const pixelDistance = Math.sqrt(dx*dx + dy*dy);
+                
+                // 화면 너비 대비 거리 스케일링
+                const normalizedDist = pixelDistance / canvasElement.width;
+
+                // 거리가 0.05 이하면 완전히 모은 것(100%), 0.4 이상이면 완전히 벌린 것(0%)
+                const minRange = 0.05;
+                const maxRange = 0.4;
+                let progress = (maxRange - normalizedDist) / (maxRange - minRange);
+                progress = Math.max(0, Math.min(1, progress));
+
+                if (mainVideo.duration) {
+                    targetTime = progress * mainVideo.duration;
+                }
+
+                // 게이지 업데이트
+                progressBar.style.width = (progress * 100) + "%";
+
+                // 가이드라인 및 이펙트 그리기
+                const lineAlpha = progress * 0.8 + 0.2;
+                
+                // 후광 효과를 위한 캔버스 설정
+                canvasCtx.shadowColor = '#64b5f6';
+                canvasCtx.shadowBlur = progress * 20 + 5;
+                
+                canvasCtx.beginPath();
+                canvasCtx.moveTo(p1x, p1y);
+                canvasCtx.lineTo(p2x, p2y);
+                canvasCtx.strokeStyle = `rgba(100, 181, 246, ${lineAlpha})`;
+                canvasCtx.lineWidth = 2 + progress * 4;
+                canvasCtx.stroke();
+
+                [ {x: p1x, y: p1y}, {x: p2x, y: p2y} ].forEach(tip => {
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(tip.x, tip.y, 4 + progress*3, 0, 2 * Math.PI);
+                    canvasCtx.fillStyle = `rgba(255, 255, 255, ${0.5 + progress*0.5})`;
+                    canvasCtx.fill();
+                });
+                
+                canvasCtx.shadowBlur = 0; // 이펙트 초기화
+
+            } else {
+                if(Date.now() - lastHandsRenderTime > 2000) {
+                    isHandsDetected = false;
+                    instruction.style.opacity = '1';
+                }
+            }
+            canvasCtx.restore();
+        }
+
+        function updateVideo() {
+            if (isHandsDetected && mainVideo.readyState >= 2) {
+                const diff = targetTime - currentVideoTime;
+                
+                // 용량이 큰 로컬 영상의 버퍼링을 고려해 보간 스피드를 0.08로 설정하여 부드럽게 Scrubbing
+                if (Math.abs(diff) > 0.01) {
+                    currentVideoTime += diff * 0.08;
+                    mainVideo.currentTime = currentVideoTime;
+                }
+            }
+            requestAnimationFrame(updateVideo);
+        }
+
+        requestAnimationFrame(updateVideo);
+
+        // 사용자가 스크러빙 외에 재생하는 것을 방지
+        mainVideo.addEventListener('play', () => {
+            mainVideo.pause();
+        });
+    </script>
+</body>
+
+</html>
